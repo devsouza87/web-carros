@@ -6,6 +6,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { auth } from "../../services/firebaseconnection";
+import {
+  createUserWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
+
+import { useNavigate } from "react-router";
+import { useEffect } from "react";
+
 const schema = z.object({
   name: z
     .string()
@@ -32,9 +42,31 @@ export function Register() {
     resolver: zodResolver(schema),
   });
 
+  const navigate = useNavigate();
+
   async function onSubmit(data: FormData) {
-    console.log(data);
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+      .then(async (userCredential) => {
+        await updateProfile(userCredential.user, {
+          displayName: data.name,
+        });
+
+        console.log("Usuário cadastrado com sucesso!");
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((error) => {
+        console.log("Erro ao cadastrar usuário");
+        console.log(error);
+      });
   }
+
+  useEffect(() => {
+    async function handleLogout() {
+      await signOut(auth);
+    }
+
+    handleLogout();
+  }, []);
 
   return (
     <Container>
@@ -73,7 +105,7 @@ export function Register() {
             type="submit"
             className="w-full h-10 bg-black text-white font-medium rounded-lg"
           >
-            Acessar
+            Cadastrar
           </button>
         </form>
         <Link to={"/login"} className="underline">
