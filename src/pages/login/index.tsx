@@ -10,7 +10,8 @@ import { auth } from "../../services/firebaseconnection";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 import { useNavigate } from "react-router";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const schema = z.object({
   email: z

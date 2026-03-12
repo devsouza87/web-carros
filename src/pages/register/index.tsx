@@ -14,7 +14,8 @@ import {
 } from "firebase/auth";
 
 import { useNavigate } from "react-router";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const schema = z.object({
   name: z
@@ -42,6 +43,8 @@ export function Register() {
     resolver: zodResolver(schema),
   });
 
+  const { handleInfoUser } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   async function onSubmit(data: FormData) {
@@ -49,6 +52,12 @@ export function Register() {
       .then(async (userCredential) => {
         await updateProfile(userCredential.user, {
           displayName: data.name,
+        });
+
+        handleInfoUser({
+          uid: userCredential.user.uid,
+          name: data.name,
+          email: data.email,
         });
 
         console.log("Usuário cadastrado com sucesso!");

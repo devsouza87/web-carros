@@ -5,6 +5,8 @@ import { auth } from "../services/firebaseconnection";
 type AuthContextData = {
   signed: boolean;
   loadingAuth: boolean;
+  handleInfoUser: ({ uid, name, email }: UserProps) => void;
+  user: UserProps | null;
 };
 
 type AuthProviderProps = {
@@ -22,6 +24,14 @@ export const AuthContext = createContext({} as AuthContextData);
 function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<UserProps | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+
+  function handleInfoUser({ uid, name, email }: UserProps) {
+    setUser({
+      uid,
+      name,
+      email,
+    });
+  }
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -42,7 +52,9 @@ function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ signed: !!user, loadingAuth }}>
+    <AuthContext.Provider
+      value={{ signed: !!user, loadingAuth, user, handleInfoUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
