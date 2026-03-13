@@ -15,7 +15,7 @@ export const Header = () => {
         </Link>
 
         {!loadingAuth && signed && (
-          <Link to="/cars">
+          <Link to="/dashboard">
             <div className="border rounded-full p-2">
               <FiUser size={24} color="#000" />
             </div>
@@ -23,10 +23,8 @@ export const Header = () => {
         )}
 
         {!loadingAuth && !signed && (
-          <Link to="/cars">
-            <div className="border rounded-full p-2">
-              <FiLogIn size={24} color="#000" />
-            </div>
+          <Link to="/login">
+            <FiLogIn size={24} color="#000" />
           </Link>
         )}
       </div>

@@ -10,6 +10,7 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 export const Input = ({
+  label,
   name,
   register,
   rules,
@@ -17,7 +18,12 @@ export const Input = ({
   ...rest
 }: InputProps) => {
   return (
-    <div className="w-full mb-4">
+    <div className="w-full md:mb-4">
+      {label && (
+        <label htmlFor={name} className="font-medium">
+          {label}
+        </label>
+      )}
       <input
         id={name}
         {...register(name, rules)}
