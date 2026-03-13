@@ -1,8 +1,19 @@
+import { type ChangeEvent, useContext, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { FiUpload } from "react-icons/fi";
+import { FiTrash, FiUpload } from "react-icons/fi";
 import { Input } from "../input";
+import { AuthContext } from "../../contexts/AuthContext";
+import { v4 as uuidv4 } from "uuid";
+
+import { storage } from "../../services/firebaseconnection";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 
 const schema = z.object({
   marca: z.string().nonempty("Marca é obrigatória"),
@@ -23,7 +34,17 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+type ImageItemProps = {
+  uid: string;
+  name: string;
+  previewUrl: string;
+  url: string;
+};
+
 export default function FormNewCar() {
+  const { user } = useContext(AuthContext);
+  const [carImages, setCarImages] = useState<ImageItemProps[]>([]);
+
   const {
     register,
     handleSubmit,
@@ -33,8 +54,59 @@ export default function FormNewCar() {
     resolver: zodResolver(schema),
   });
 
+  async function handleFile(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const image = e.target.files[0];
+
+      if (
+        image.type === "image/jpeg" ||
+        image.type === "image/jpg" ||
+        image.type === "image/png"
+      ) {
+        await handleUpload(image);
+      } else {
+        alert("envie uma imagem no formato jpeg ou png");
+      }
+    }
+  }
+
+  async function handleUpload(image: File) {
+    if (!user?.uid) {
+      return;
+    }
+
+    const currentUid = user.uid;
+    const uidImage = uuidv4();
+
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
+    uploadBytes(uploadRef, image).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((url) => {
+        const imageItem = {
+          name: uidImage,
+          uid: currentUid,
+          previewUrl: URL.createObjectURL(image),
+          url,
+        };
+
+        setCarImages((prev) => [...prev, imageItem]);
+      });
+    });
+  }
+
   function onSubmit(data: FormData) {
     console.log(data);
+  }
+
+  async function handleDeleteImage(image: ImageItemProps) {
+    const imagePath = `images/${image.uid}/${image.name}`;
+    const imageRef = ref(storage, imagePath);
+
+    try {
+      await deleteObject(imageRef);
+      setCarImages((prev) => prev.filter((item) => item.name !== image.name));
+    } catch (error) {
+      console.error("Erro ao excluir imagem:", error);
+    }
   }
 
   return (
@@ -49,9 +121,31 @@ export default function FormNewCar() {
               type="file"
               accept="image/*"
               className="cursor-pointer opacity-0"
+              onChange={handleFile}
             />
           </div>
         </button>
+
+        {carImages &&
+          carImages.length > 0 &&
+          carImages.map((image) => (
+            <div
+              key={image.name}
+              className="w-full h-12 flex items-center justify-center relative"
+            >
+              <button
+                className="absolute cursor-pointer"
+                onClick={() => handleDeleteImage(image)}
+              >
+                <FiTrash size={28} color="#fff" />
+              </button>
+              <img
+                src={image.previewUrl}
+                className="w-full  h-32 object-cover rounded-lg"
+                alt="Foto do carro"
+              />
+            </div>
+          ))}
       </div>
 
       <div className="w-full bg-white p-3 rounded-lg flex flex-col  sm-flex-row items-center gap-2">
@@ -146,6 +240,9 @@ export default function FormNewCar() {
               placeholder="Descrição do carro"
               {...register("descricao")}
             />
+            {errors.descricao && (
+              <span className="text-red-500">{errors.descricao.message}</span>
+            )}
           </div>
 
           <button
