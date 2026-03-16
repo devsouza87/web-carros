@@ -7,13 +7,14 @@ import { Input } from "../input";
 import { AuthContext } from "../../contexts/AuthContext";
 import { v4 as uuidv4 } from "uuid";
 
-import { storage } from "../../services/firebaseconnection";
+import { storage, db } from "../../services/firebaseconnection";
 import {
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
+import { addDoc, collection } from "firebase/firestore";
 
 const schema = z.object({
   marca: z.string().nonempty("Marca é obrigatória"),
@@ -49,7 +50,7 @@ export default function FormNewCar() {
     register,
     handleSubmit,
     formState: { errors },
-    //reset,
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
@@ -93,10 +94,6 @@ export default function FormNewCar() {
     });
   }
 
-  function onSubmit(data: FormData) {
-    console.log(data);
-  }
-
   async function handleDeleteImage(image: ImageItemProps) {
     const imagePath = `images/${image.uid}/${image.name}`;
     const imageRef = ref(storage, imagePath);
@@ -107,6 +104,34 @@ export default function FormNewCar() {
     } catch (error) {
       console.error("Erro ao excluir imagem:", error);
     }
+  }
+
+  function onSubmit(data: FormData) {
+    if (carImages.length === 0) {
+      alert("Adicione pelo menos uma imagem");
+      return;
+    }
+
+    const carListImages = carImages.map((car) => ({
+      uid: car.uid,
+      name: car.name,
+      url: car.url,
+    }));
+
+    addDoc(collection(db, "cars"), {
+      ...data,
+      criado: new Date(),
+      dono: user?.uid,
+      imagens: carListImages,
+    })
+      .then(() => {
+        reset();
+        setCarImages([]);
+        alert("Carro cadastrado com sucesso");
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   }
 
   return (
