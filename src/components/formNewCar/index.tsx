@@ -1,6 +1,6 @@
 import { type ChangeEvent, useContext, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { FiTrash, FiUpload } from "react-icons/fi";
 import { Input } from "../input";
@@ -17,20 +17,20 @@ import {
 import { addDoc, collection } from "firebase/firestore";
 
 const schema = z.object({
-  marca: z.string().nonempty("Marca é obrigatória"),
-  modelo: z.string().nonempty("Modelo é obrigatório"),
-  ano: z.string().nonempty("Ano é obrigatório"),
-  km: z.string().nonempty("Km é obrigatório"),
-  preco: z.string().nonempty("Preço é obrigatório"),
-  cidade: z.string().nonempty("Cidade é obrigatória"),
-  estado: z.string().nonempty("Estado é obrigatório"),
-  telefone: z
+  make: z.string().nonempty("Marca é obrigatória"),
+  model: z.string().nonempty("Modelo é obrigatório"),
+  year: z.string().nonempty("Ano é obrigatório"),
+  mileage: z.string().nonempty("Km é obrigatório"),
+  price: z.string().nonempty("Preço é obrigatório"),
+  city: z.string().nonempty("Cidade é obrigatória"),
+  state: z.string().nonempty("Estado é obrigatório"),
+  phone: z
     .string()
     .nonempty("Telefone/Whatsapp é obrigatório")
     .refine((value) => /^(\d{10,11}$)/.test(value), {
       message: "Telefone inválido",
     }),
-  descricao: z.string().nonempty("Descrição é obrigatória"),
+  description: z.string().nonempty("Descrição é obrigatória"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -59,39 +59,37 @@ export default function FormNewCar() {
     if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0];
 
-      if (
-        image.type === "image/jpeg" ||
-        image.type === "image/jpg" ||
-        image.type === "image/png"
-      ) {
+      if (image.type === "image/jpeg" || image.type === "image/png") {
         await handleUpload(image);
       } else {
-        alert("envie uma imagem no formato jpeg ou png");
+        alert("Envie uma imagem no formato JPEG ou PNG");
       }
     }
   }
 
   async function handleUpload(image: File) {
-    if (!user?.uid) {
-      return;
-    }
+    if (!user?.uid) return;
 
     const currentUid = user.uid;
     const uidImage = uuidv4();
 
     const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
-    uploadBytes(uploadRef, image).then((snapshot) => {
-      getDownloadURL(snapshot.ref).then((url) => {
-        const imageItem = {
-          name: uidImage,
-          uid: currentUid,
-          previewUrl: URL.createObjectURL(image),
-          url,
-        };
 
-        setCarImages((prev) => [...prev, imageItem]);
-      });
-    });
+    try {
+      const snapshot = await uploadBytes(uploadRef, image);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+
+      const imageItem = {
+        name: uidImage,
+        uid: currentUid,
+        previewUrl: URL.createObjectURL(image),
+        url: downloadUrl,
+      };
+
+      setCarImages((prev) => [...prev, imageItem]);
+    } catch (error) {
+      console.error("Erro no upload:", error);
+    }
   }
 
   async function handleDeleteImage(image: ImageItemProps) {
@@ -120,161 +118,149 @@ export default function FormNewCar() {
 
     addDoc(collection(db, "cars"), {
       ...data,
-      criado: new Date(),
-      dono: user?.uid,
-      imagens: carListImages,
+      createdAt: new Date(),
+      ownerId: user?.uid,
+      images: carListImages,
     })
       .then(() => {
         reset();
         setCarImages([]);
-        alert("Carro cadastrado com sucesso");
+        alert("Carro cadastrado com sucesso!");
       })
       .catch((error) => {
-        alert(error.message);
+        console.log(error);
+        alert("Erro ao cadastrar no banco de dados.");
       });
   }
 
   return (
     <>
-      <div className="w-full bg-white p-3 rounded-ld flex flex-col sm:flex-row items-center gap-2 mb-2">
-        <button className="border w-48 rounded-g flex items-center justify-center cursor-pointer border-gray-600 h-32">
-          <div className="absolute cursor-pointer">
+      <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mb-2">
+        <button className="shrink-0 border w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 relative">
+          <div className="absolute">
             <FiUpload size={30} color="#000" />
           </div>
-          <div className="cursor-pointer">
-            <input
-              type="file"
-              accept="image/*"
-              className="cursor-pointer opacity-0"
-              onChange={handleFile}
-            />
-          </div>
+          <input
+            type="file"
+            accept="image/*"
+            className="opacity-0 w-full h-full cursor-pointer"
+            onChange={handleFile}
+          />
         </button>
 
-        {carImages &&
-          carImages.length > 0 &&
-          carImages.map((image) => (
-            <div
-              key={image.name}
-              className="w-full h-12 flex items-center justify-center relative"
+        {carImages.map((image) => (
+          <div
+            key={image.name}
+            className="w-full h-32 flex items-center justify-center relative"
+          >
+            <button
+              className="absolute z-10 bg-red-500 p-1 rounded-full cursor-pointer"
+              onClick={() => handleDeleteImage(image)}
+              type="button"
             >
-              <button
-                className="absolute cursor-pointer"
-                onClick={() => handleDeleteImage(image)}
-              >
-                <FiTrash size={28} color="#fff" />
-              </button>
-              <img
-                src={image.previewUrl}
-                className="w-full  h-32 object-cover rounded-lg"
-                alt="Foto do carro"
-              />
-            </div>
-          ))}
+              <FiTrash size={20} color="#fff" />
+            </button>
+            <img
+              src={image.previewUrl}
+              className="w-full h-32 object-cover rounded-lg"
+              alt="Foto do carro"
+            />
+          </div>
+        ))}
       </div>
 
-      <div className="w-full bg-white p-3 rounded-lg flex flex-col  sm-flex-row items-center gap-2">
+      <div className="w-full bg-white p-3 rounded-lg">
         <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
+          <div className="flex flex-col md:flex-row items-center gap-4 mb-3">
             <Input
               type="text"
               label="Marca"
-              name="marca"
-              id="marca"
-              placeholder="Chevrolet"
+              name="make"
               register={register}
-              error={errors.marca?.message}
+              error={errors.make?.message}
+              placeholder="Ex: Chevrolet..."
             />
             <Input
               type="text"
               label="Modelo"
-              name="modelo"
-              id="modelo"
-              placeholder="Onix"
+              name="model"
               register={register}
-              error={errors.modelo?.message}
+              error={errors.model?.message}
+              placeholder="Ex: Onix 1.0..."
             />
           </div>
-          <div className="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
+
+          <div className="flex flex-col md:flex-row items-center gap-4 mb-3">
             <Input
               type="text"
               label="Ano"
-              name="ano"
-              id="ano"
-              placeholder="2020/2021"
+              name="year"
               register={register}
-              error={errors.ano?.message}
+              error={errors.year?.message}
+              placeholder="Ex: 2020/2021"
             />
             <Input
               type="text"
               label="KM"
-              name="km"
-              id="km"
-              placeholder="85.000"
+              name="mileage"
               register={register}
-              error={errors.km?.message}
+              error={errors.mileage?.message}
+              placeholder="Ex: 85.000"
             />
             <Input
               type="text"
               label="Preço"
-              name="preco"
-              id="preco"
-              placeholder="R$ 1.500,00"
+              name="price"
               register={register}
-              error={errors.preco?.message}
+              error={errors.price?.message}
+              placeholder="Ex: 65.000"
             />
           </div>
 
-          <div className="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
+          <div className="flex flex-col md:flex-row items-center gap-4 mb-3">
             <Input
               type="text"
               label="Cidade"
-              name="cidade"
-              id="cidade"
-              placeholder="Vitória"
+              name="city"
               register={register}
-              error={errors.cidade?.message}
+              error={errors.city?.message}
+              placeholder="Ex: Vitória"
             />
             <Input
               type="text"
               label="Estado"
-              name="estado"
-              id="estado"
-              placeholder="ES"
+              name="state"
               register={register}
-              error={errors.estado?.message}
+              error={errors.state?.message}
+              placeholder="Ex: ES"
             />
             <Input
               type="text"
               label="Telefone/Whatsapp"
-              name="telefone"
-              id="telefone"
-              placeholder="(27) 9 9999-9999"
+              name="phone"
               register={register}
-              error={errors.telefone?.message}
+              error={errors.phone?.message}
+              placeholder="Ex: 27999999999"
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="descricao" className="font-medium">
-              Descrição
-            </label>
+
+          <div className="mb-3">
+            <p className="mb-2 font-medium">Descrição</p>
             <textarea
-              id="descricao"
-              className="w-full h-28 border rounded-lg px-2 resize-none"
-              rows={5}
-              placeholder="Descrição do carro"
-              {...register("descricao")}
+              className="border w-full rounded-md h-24 px-2 resize-none"
+              {...register("description")}
+              placeholder="Digite a descrição completa sobre o carro..."
             />
-            {errors.descricao && (
-              <span className="text-red-500">{errors.descricao.message}</span>
+            {errors.description && (
+              <p className="text-red-500 my-1">{errors.description.message}</p>
             )}
           </div>
 
           <button
             type="submit"
-            className="w-full h-10 bg-black text-white font-medium rounded-lg cursor-pointer"
+            className="w-full rounded-md bg-zinc-900 text-white font-medium h-10"
           >
-            Cadastrar carro
+            Cadastrar
           </button>
         </form>
       </div>
