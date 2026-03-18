@@ -4,6 +4,7 @@ import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../../services/firebaseconnection";
 import { Card } from "../../components/card";
 import type { CarProps } from "../../types/CarProps";
+import { Link } from "react-router";
 
 export function Home() {
   const [cars, setCars] = useState<CarProps[]>([]);
@@ -57,7 +58,9 @@ export function Home() {
 
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {cars.map((car) => (
-          <Card car={car} />
+          <Link key={car.id} to={`/car/${car.id}`}>
+            <Card car={car} />
+          </Link>
         ))}
       </main>
     </Container>

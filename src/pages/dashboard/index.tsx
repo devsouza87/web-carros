@@ -24,7 +24,6 @@ export function Dashboard() {
 
     try {
       await deleteDoc(itemDoc);
-
       car.images.forEach(async (image) => {
         const imagePath = `images/${image.uid}/${image.name}`;
         const imageRef = ref(storage, imagePath);
