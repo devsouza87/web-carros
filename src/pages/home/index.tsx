@@ -2,34 +2,11 @@ import Container from "../../components/container";
 import { useState, useEffect } from "react";
 import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../../services/firebaseconnection";
-import { set } from "zod";
-
-type CarProps = {
-  id: string;
-  make: string;
-  model: string;
-  year: string;
-  mileage: string;
-  price: string;
-  city: string;
-  state: string;
-  ownerId: string;
-  images: CarImageProps[];
-};
-
-type CarImageProps = {
-  name: string;
-  uid: string;
-  url: string;
-};
+import { Card } from "../../components/card";
+import type { CarProps } from "../../types/CarProps";
 
 export function Home() {
   const [cars, setCars] = useState<CarProps[]>([]);
-  const [loadImages, setLoadImages] = useState<string[]>([]);
-
-  function handleImageCar(id: string) {
-    setLoadImages((prev) => [...prev, id]);
-  }
 
   useEffect(() => {
     async function loadCars() {
@@ -80,53 +57,7 @@ export function Home() {
 
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {cars.map((car) => (
-          <section
-            key={car.id}
-            className="w-full bg-white rounded-lg overflow-hidden shadow-sm"
-          >
-            <div
-              className="w-full h-72 rounded-lg bg-slate-200"
-              style={{
-                display: loadImages.includes(car.id) ? "none" : "block",
-              }}
-            ></div>
-            <div className="w-full aspect-video overflow-hidden bg-gray-100 mb-1">
-              {car.images[0] && (
-                <img
-                  src={car.images[0].url}
-                  alt={car.model}
-                  onLoad={() => handleImageCar(car.id)}
-                  className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-110"
-                  style={{
-                    display: loadImages.includes(car.id) ? "block" : "none",
-                  }}
-                />
-              )}
-            </div>
-
-            <div className="px-3">
-              <h2 className="font-bold mb-2 text-lg uppercase">
-                {car.make} - {car.model}
-              </h2>
-
-              <div className="flex flex-col">
-                <span className="text-zinc-600 mb-4">
-                  Ano: {car.year} | {car.mileage} km
-                </span>
-                <strong className="text-black text-xl font-bold">
-                  R$ {car.price}
-                </strong>
-              </div>
-
-              <div className="w-full h-px bg-slate-200 my-3"></div>
-
-              <div className="pb-3 text-zinc-700 text-sm">
-                <span>
-                  {car.city} - {car.state.toUpperCase()}
-                </span>
-              </div>
-            </div>
-          </section>
+          <Card car={car} />
         ))}
       </main>
     </Container>
