@@ -80,6 +80,12 @@ export function Car() {
           slidesPerView={sliderPreview}
           pagination={{ clickable: true }}
           navigation
+          style={{
+            "--swiper-navigation-color": "#fb2c36",
+            "--swiper-pagination-color": "#fb2c36",
+            "--swiper-pagination-bullet-inactive-color": "#ff6467",
+            "--swiper-pagination-bullet-inactive-opacity": "0.5",
+          }}
         >
           {car?.images.map((image) => {
             return (
