@@ -1,4 +1,10 @@
-# 🚗 Web-Carros Marketplace
+<div align="center">
+  <img src="./src/assets/logo.svg" alt="Logo Web-Carros" width="200">
+  <h1>🚗 Web-Carros Marketplace</h1>
+  <p>Sua plataforma moderna para compra e venda de veículos</p>
+</div>
+
+---
 
 Um marketplace completo para compra e venda de veículos, desenvolvido com tecnologias modernas de desenvolvimento web. O projeto conta com uma interface pública para busca de anúncios e um dashboard privado para gerenciamento de listagens.
 
