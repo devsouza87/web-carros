@@ -16,6 +16,7 @@ import {
 import { useNavigate } from "react-router";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   name: z
@@ -60,12 +61,14 @@ export function Register() {
           email: data.email,
         });
 
-        console.log("Usuário cadastrado com sucesso!");
         navigate("/dashboard", { replace: true });
       })
       .catch((error) => {
-        console.log("Erro ao cadastrar usuário");
-        console.log(error);
+        if (error.message.includes("auth/email-already-in-use")) {
+          toast.error("Email já cadastrado");
+        } else {
+          toast.error("Erro ao cadastrar usuário");
+        }
       });
   }
 

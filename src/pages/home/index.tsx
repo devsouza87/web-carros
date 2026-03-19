@@ -46,8 +46,8 @@ export function Home() {
 
     const q = query(
       collection(db, "cars"),
-      where("make", ">=", input.trim()),
-      where("make", "<=", input.trim() + "\uf8ff"),
+      where("make", ">=", input.trim().toUpperCase()),
+      where("make", "<=", input.trim().toLocaleUpperCase() + "\uf8ff"),
     );
     const querySnapshot = await getDocs(q);
 

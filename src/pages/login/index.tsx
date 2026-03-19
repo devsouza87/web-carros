@@ -5,13 +5,11 @@ import { Input } from "../../components/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { auth } from "../../services/firebaseconnection";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-
 import { useNavigate } from "react-router";
-import { useContext, useEffect } from "react";
-import { AuthContext } from "../../contexts/AuthContext";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   email: z
@@ -38,12 +36,13 @@ export function Login() {
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         navigate("/dashboard", { replace: true });
-        console.log("Usuário logado com sucesso!");
-        console.log(userCredential);
       })
       .catch((error) => {
-        console.log("Erro ao fazer login");
-        console.log(error);
+        if (error.messege === "Firebase: Error (auth/invalid-credential).") {
+          toast.error("Email ou senha incorretos!");
+        } else {
+          toast.error("Erro ao realizar login!");
+        }
       });
   }
 
