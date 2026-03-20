@@ -38,7 +38,7 @@ export function Login() {
         navigate("/dashboard", { replace: true });
       })
       .catch((error) => {
-        if (error.messege === "Firebase: Error (auth/invalid-credential).") {
+        if (error.message === "Firebase: Error (auth/invalid-credential).") {
           toast.error("Email ou senha incorretos!");
         } else {
           toast.error("Erro ao realizar login!");
