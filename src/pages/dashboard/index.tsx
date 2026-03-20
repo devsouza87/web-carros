@@ -14,6 +14,7 @@ import {
 import { db, storage } from "../../services/firebaseconnection";
 import type { CarProps } from "../../types/CarProps";
 import { deleteObject, ref } from "firebase/storage";
+import { Link } from "react-router";
 
 export function Dashboard() {
   const [cars, setCars] = useState<CarProps[]>([]);
@@ -67,12 +68,14 @@ export function Dashboard() {
       <PanelHeader />
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3  ">
         {cars.map((car) => (
-          <Card
-            key={car.id}
-            car={car}
-            showDelete={true}
-            onDelete={handleDelete}
-          />
+          <Link key={car.id} to={`/dashboard/edit/${car.id}`}>
+            <Card
+              key={car.id}
+              car={car}
+              showDelete={true}
+              onDelete={handleDelete}
+            />
+          </Link>
         ))}
       </main>
     </Container>

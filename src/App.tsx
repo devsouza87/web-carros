@@ -4,6 +4,7 @@ import { Home } from "./pages/home";
 import { Dashboard } from "./pages/dashboard";
 import { Car } from "./pages/car";
 import { New } from "./pages/dashboard/new";
+import { EditCar } from "./pages/dashboard/edit";
 import { Login } from "./pages/login";
 import { Register } from "./pages/register";
 
@@ -31,6 +32,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <New />,
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/dashboard/edit/:id",
+        element: (
+          <PrivateRoute>
+            <EditCar />,
           </PrivateRoute>
         ),
       },

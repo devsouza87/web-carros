@@ -1,4 +1,4 @@
-import { type ChangeEvent, useContext, useState } from "react";
+import { type ChangeEvent, useContext, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
@@ -6,7 +6,6 @@ import { FiTrash, FiUpload } from "react-icons/fi";
 import { Input } from "../input";
 import { AuthContext } from "../../contexts/AuthContext";
 import { v4 as uuidv4 } from "uuid";
-
 import { storage, db } from "../../services/firebaseconnection";
 import {
   ref,
@@ -14,9 +13,10 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { addDoc, collection } from "firebase/firestore";
-
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
+import type { CarProps } from "../../types/CarProps";
 
 const schema = z.object({
   make: z.string().nonempty("Marca é obrigatória"),
@@ -26,12 +26,7 @@ const schema = z.object({
   price: z.string().nonempty("Preço é obrigatório"),
   city: z.string().nonempty("Cidade é obrigatória"),
   state: z.string().nonempty("Estado é obrigatório"),
-  phone: z
-    .string()
-    .nonempty("Telefone/Whatsapp é obrigatório")
-    .refine((value) => /^(\d{10,11}$)/.test(value), {
-      message: "Telefone inválido",
-    }),
+  phone: z.string().nonempty("Telefone/Whatsapp é obrigatório"),
   description: z.string().nonempty("Descrição é obrigatória"),
 });
 
@@ -44,8 +39,13 @@ type ImageItemProps = {
   url: string;
 };
 
-export default function FormNewCar() {
+type CarFormProps = {
+  car?: CarProps;
+};
+
+export default function CarForm({ car }: CarFormProps) {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [carImages, setCarImages] = useState<ImageItemProps[]>([]);
 
   const {
@@ -55,12 +55,37 @@ export default function FormNewCar() {
     reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
+    mode: "onChange",
   });
+
+  useEffect(() => {
+    if (car) {
+      reset({
+        make: car.make,
+        model: car.model,
+        year: car.year,
+        mileage: car.mileage,
+        price: car.price,
+        city: car.city,
+        state: car.state,
+        phone: car.phone,
+        description: car.description,
+      });
+
+      const imagesLoaded = car.images.map((img) => ({
+        uid: img.uid,
+        name: img.name,
+        url: img.url,
+        previewUrl: img.url,
+      }));
+
+      setCarImages(imagesLoaded);
+    }
+  }, [car, reset]);
 
   async function handleFile(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0];
-
       if (image.type === "image/jpeg" || image.type === "image/png") {
         await handleUpload(image);
       } else {
@@ -71,23 +96,19 @@ export default function FormNewCar() {
 
   async function handleUpload(image: File) {
     if (!user?.uid) return;
-
     const currentUid = user.uid;
     const uidImage = uuidv4();
-
     const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
 
     try {
       const snapshot = await uploadBytes(uploadRef, image);
       const downloadUrl = await getDownloadURL(snapshot.ref);
-
       const imageItem = {
         name: uidImage,
         uid: currentUid,
         previewUrl: URL.createObjectURL(image),
         url: downloadUrl,
       };
-
       setCarImages((prev) => [...prev, imageItem]);
     } catch (error) {
       console.error("Erro no upload:", error);
@@ -97,7 +118,6 @@ export default function FormNewCar() {
   async function handleDeleteImage(image: ImageItemProps) {
     const imagePath = `images/${image.uid}/${image.name}`;
     const imageRef = ref(storage, imagePath);
-
     try {
       await deleteObject(imageRef);
       setCarImages((prev) => prev.filter((item) => item.name !== image.name));
@@ -106,34 +126,44 @@ export default function FormNewCar() {
     }
   }
 
-  function onSubmit(data: FormData) {
+  async function onSubmit(data: FormData) {
     if (carImages.length === 0) {
       toast.error("Adicione pelo menos uma imagem do carro.");
       return;
     }
 
-    const carListImages = carImages.map((car) => ({
-      uid: car.uid,
-      name: car.name,
-      url: car.url,
+    const carListImages = carImages.map((img) => ({
+      uid: img.uid,
+      name: img.name,
+      url: img.url,
     }));
 
-    addDoc(collection(db, "cars"), {
+    const carData = {
       ...data,
       make: data.make.toUpperCase(),
       model: data.model.toUpperCase(),
-      createdAt: new Date(),
       ownerId: user?.uid,
       images: carListImages,
-    })
-      .then(() => {
-        reset();
-        setCarImages([]);
+    };
+
+    try {
+      if (car?.id) {
+        const docRef = doc(db, "cars", car.id);
+        await updateDoc(docRef, carData);
+        toast.success("Carro atualizado com sucesso!");
+      } else {
+        await addDoc(collection(db, "cars"), {
+          ...carData,
+          createdAt: new Date(),
+        });
         toast.success("Carro cadastrado com sucesso!");
-      })
-      .catch((error) => {
-        toast.error("Erro ao cadastrar no banco de dados.");
-      });
+      }
+      reset();
+      setCarImages([]);
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error("Erro ao salvar no banco de dados.");
+    }
   }
 
   return (
@@ -166,7 +196,7 @@ export default function FormNewCar() {
             <img
               src={image.previewUrl}
               className="w-full h-32 object-cover rounded-lg"
-              alt="Foto do carro"
+              alt="Foto"
             />
           </div>
         ))}
@@ -252,7 +282,7 @@ export default function FormNewCar() {
             <textarea
               className="border w-full rounded-md h-24 px-2 resize-none"
               {...register("description")}
-              placeholder="Digite a descrição completa sobre o carro..."
+              placeholder="Digite a descrição completa..."
             />
             {errors.description && (
               <p className="text-red-500 my-1">{errors.description.message}</p>
@@ -261,9 +291,9 @@ export default function FormNewCar() {
 
           <button
             type="submit"
-            className="w-full rounded-md bg-zinc-900 text-white font-medium h-10"
+            className="w-full rounded-md bg-zinc-900 text-white font-medium h-10 cursor-pointer hover:bg-zinc-700 transition-all duration-300"
           >
-            Cadastrar
+            {car ? "Atualizar Carro" : "Cadastrar"}
           </button>
         </form>
       </div>

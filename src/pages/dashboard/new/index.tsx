@@ -1,12 +1,12 @@
 import Container from "../../../components/container";
 import PanelHeader from "../../../components/panelHeader";
-import FormNewCar from "../../../components/formNewCar";
+import CarForm from "../../../components/carForm";
 
 export function New() {
   return (
     <Container>
       <PanelHeader />
-      <FormNewCar />
+      <CarForm />
     </Container>
   );
 }

@@ -7,6 +7,8 @@ export type CarProps = {
   price: string;
   city: string;
   state: string;
+  phone: string;
+  description: string;
   ownerId: string;
   images: CarImageProps[];
 };
