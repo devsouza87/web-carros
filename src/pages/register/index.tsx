@@ -1,10 +1,17 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import logo from "../../assets/logo.svg";
 import { Container } from "../../components/container";
 import { Input } from "../../components/input";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { auth } from "../../services/firebaseConnection";
+import {
+  createUserWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
+import { useEffect } from "react";
 
 const loginSchema = z.object({
   name: z.string().min(2, "O campo nome deve ter 2 ou mais caracteres."),
@@ -18,6 +25,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export const Register = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -25,10 +33,28 @@ export const Register = () => {
     reset,
   } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
 
-  const onSubmit = (data: LoginForm) => {
-    console.log("Dados validados e enviados:", data);
-    reset();
+  const onSubmit = async (data: LoginForm) => {
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+      .then(async (r) => {
+        await updateProfile(r.user, {
+          displayName: data.name,
+        });
+        console.log("Cadastrado com sucesso!");
+        reset();
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((error) => {
+        console.log("Erro ao cadastrar esse usuário");
+        console.error(error);
+      });
   };
+
+  useEffect(() => {
+    async function handleLogout() {
+      await signOut(auth);
+    }
+    handleLogout();
+  }, []);
 
   return (
     <Container>

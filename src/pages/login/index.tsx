@@ -1,10 +1,13 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import logo from "../../assets/logo.svg";
 import { Container } from "../../components/container";
 import { Input } from "../../components/input";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { auth } from "../../services/firebaseConnection";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { useEffect } from "react";
 
 const loginSchema = z.object({
   email: z
@@ -17,6 +20,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export const Login = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -24,8 +28,24 @@ export const Login = () => {
   } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = (data: LoginForm) => {
-    console.log("Dados validados e enviados:", data);
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then((user) => {
+        console.log("Logado com sucesso!!!");
+        console.log(user);
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((error) => {
+        console.log("Erro ao logar");
+        console.error(error);
+      });
   };
+
+  useEffect(() => {
+    async function handleLogout() {
+      await signOut(auth);
+    }
+    handleLogout();
+  }, []);
 
   return (
     <Container>
