@@ -11,7 +11,8 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const loginSchema = z.object({
   name: z.string().min(2, "O campo nome deve ter 2 ou mais caracteres."),
@@ -25,6 +26,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export const Register = () => {
+  const { handleInfoUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const {
     register,
@@ -39,6 +41,13 @@ export const Register = () => {
         await updateProfile(r.user, {
           displayName: data.name,
         });
+
+        handleInfoUser({
+          name: data.name,
+          email: data.email,
+          uid: r.user.uid,
+        });
+
         console.log("Cadastrado com sucesso!");
         reset();
         navigate("/dashboard", { replace: true });
