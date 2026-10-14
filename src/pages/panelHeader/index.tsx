@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { signOut } from "firebase/auth";
-import { auth } from "../../services/firebaseConnection";
+import { auth } from "../../services/firebase/firebaseConnection";
 
 export const PanelHeader = () => {
   async function handleLogout() {

@@ -5,7 +5,7 @@ import { Input } from "../../components/input";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { auth } from "../../services/firebaseConnection";
+import { auth } from "../../services/firebase/firebaseConnection";
 import {
   createUserWithEmailAndPassword,
   signOut,
