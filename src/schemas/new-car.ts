@@ -8,7 +8,7 @@ export const newCarSchema = z.object({
   price: z.string().nonempty("O preço é obrigatório."),
   city: z.string().nonempty(" A Cidade obrigatória."),
   state: z.string().nonempty("O Estado é obrigatório."),
-  whatsapp: z
+  telephone: z
     .string()
     .nonempty("O Estado é obrigatório.")
     .refine((v) => /^\d{10,12}$/.test(v), {

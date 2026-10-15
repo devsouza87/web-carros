@@ -1,7 +1,45 @@
 import { Container } from "../../components/layout/container";
 import { Button } from "../../components/ui/button";
+import { collection, query, getDocs, orderBy } from "firebase/firestore";
+import { db } from "../../services/firebase/firebaseConnection";
+import { useEffect, useState } from "react";
+import { Card } from "../../components/Card";
+import type { CardProps } from "../../types/Card";
+import { Link } from "react-router";
 
 export const Home = () => {
+  const [carCards, setCarCards] = useState<CardProps[]>([]);
+
+  useEffect(() => {
+    async function loadCars() {
+      const carsRef = collection(db, "cars");
+      const queryRef = query(carsRef, orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(queryRef);
+
+      const listCars: CardProps[] = [];
+
+      snapshot.forEach((doc) => {
+        listCars.push({
+          id: doc.id,
+          make: doc.data().make,
+          model: doc.data().model,
+          year: doc.data().year,
+          km: doc.data().km,
+          city: doc.data().city,
+          state: doc.data().state,
+          price: doc.data().price,
+          images: doc.data().images,
+          uid: doc.data().uid,
+          description: doc.data().description,
+        });
+      });
+
+      setCarCards(listCars);
+    }
+
+    loadCars();
+  }, []);
+
   return (
     <Container>
       <section className="flex justify-center items-center gap-2 bg-white w-full max-w-3xl rounded-lg p-4 mx-auto mb-6">
@@ -17,29 +55,11 @@ export const Home = () => {
       </h1>
 
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <section className="w-full bg-white rounded-lg">
-          <img
-            className="w-full rounded-lg mb-2 max-h-72"
-            src="https://image.webmotors.com.br/_fotos/anunciousados/gigante/2026/202610/20261005/land-rover-discovery-sport-2.0-p250-turbo-flex-rdynamic-se-automatico-wmimagem10401883163.jpg?s=fill&w=552&h=414&q=60"
-            alt="LAND ROVER DISCOVERY SPORT"
-          />
-
-          <h1 className="font-bold my-2 px-2">LAND ROVER DISCOVERY SPORT</h1>
-          <div className="flex flex-col px-2">
-            <span className="text-zinc-700 mb-6">
-              Ano: 2020/2021 | 6.390 km
-            </span>
-            <strong className="text-black font-medium text-xl">
-              R$ 345.000,00
-            </strong>
-          </div>
-
-          <div className="w-full h-px bg-slate-200 my-2"></div>
-
-          <div className="px-2 pb-2">
-            <span className="text-zinc-700">Cariacica - ES </span>
-          </div>
-        </section>
+        {carCards.map((car) => (
+          <Link key={car.id} to={`/car/${car.id}`}>
+            <Card {...car} />
+          </Link>
+        ))}
       </main>
     </Container>
   );

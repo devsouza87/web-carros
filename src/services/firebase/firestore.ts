@@ -8,20 +8,19 @@ export async function createCar(
   carImages: CarImage[],
   user: { uid: string; name: string },
 ) {
-  const newCar = await addDoc(collection(db, "cars"), {
+  await addDoc(collection(db, "cars"), {
     make: data.make,
     model: data.model,
-    yer: data.year,
+    year: data.year,
     km: data.km,
     price: data.price,
     city: data.city,
     state: data.state,
-    telephone: data.whatsapp,
+    telephone: data.telephone,
     description: data.description,
     createdAt: new Date(),
     owner: user.name,
     uid: user.uid,
     images: carImages,
   });
-  console.log(newCar);
 }

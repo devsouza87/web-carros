@@ -82,9 +82,9 @@ export const CarForm = ({
           <Input
             label="Telefone/Whatsapp"
             type="text"
-            name="whatsapp"
+            name="telephone"
             register={register}
-            errorMessage={errors.whatsapp?.message}
+            errorMessage={errors.telephone?.message}
           />
         </div>
         <div className="mb-3">
