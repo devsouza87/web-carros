@@ -1,4 +1,5 @@
-import { Container } from "../../components/container";
+import { Container } from "../../components/layout/container";
+import { Button } from "../../components/ui/button";
 
 export const Home = () => {
   return (
@@ -9,9 +10,7 @@ export const Home = () => {
           placeholder="Digite o nome do carro..."
           className="w-full border rounded-lg h-9 px-3 outline-none"
         />
-        <button className="bg-red-500 h-9 px-8 rounded-lg text-white font-medium text-lg">
-          Buscar
-        </button>
+        <Button bg="bg-red-500" label="Buscar" />
       </section>
       <h1 className="font-bold text-center text-2xl mb-4">
         Carros novos e usados em todo o Brasil

@@ -1,4 +1,4 @@
-import { Container } from "../../components/container";
+import { Container } from "../../components/layout/container";
 import { PanelHeader } from "../panelHeader";
 
 export const Dashboard = () => {

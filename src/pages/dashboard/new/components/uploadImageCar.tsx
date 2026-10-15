@@ -1,12 +1,12 @@
 import { FiTrash2, FiUpload } from "react-icons/fi";
-import type { ImageItemProps } from "../../pages/dashboard/new";
+import type { ImageItemProps } from "../index";
 import {
   useContext,
   type ChangeEvent,
   type Dispatch,
   type SetStateAction,
 } from "react";
-import { AuthContext } from "../../contexts/AuthContext";
+import { AuthContext } from "../../../../contexts/AuthContext";
 import { v4 as uuidV4 } from "uuid";
 
 type UploadCarProps = {
@@ -14,7 +14,7 @@ type UploadCarProps = {
   setCarImages: Dispatch<SetStateAction<ImageItemProps[]>>;
 };
 
-export const UploadCar = ({ carImages, setCarImages }: UploadCarProps) => {
+export const UploadImageCar = ({ carImages, setCarImages }: UploadCarProps) => {
   const { user } = useContext(AuthContext);
 
   async function handleFile(e: ChangeEvent<HTMLInputElement>) {

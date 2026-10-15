@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import logo from "../../assets/logo.svg";
-import { Container } from "../../components/container";
-import { Input } from "../../components/input";
+import { Container } from "../../components/layout/container";
+import { Input } from "../../components/ui/input";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

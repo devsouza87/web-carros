@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
-import { Container } from "../../../components/container";
+import { Container } from "../../../components/layout/container";
 import { PanelHeader } from "../../panelHeader";
-import { Input } from "../../../components/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AuthContext } from "../../../contexts/AuthContext";
@@ -9,7 +8,8 @@ import { newCarSchema, type NewCarDTO } from "../../../schemas/new-car";
 import { uploadImage } from "../../../services/firebase/storage";
 import { createCar } from "../../../services/firebase/firestore";
 import type { CarImage } from "../../../types/CarImage";
-import { UploadCar } from "../../../components/uploadCar";
+import { UploadImageCar } from "./components/uploadImageCar";
+import { CarForm } from "./components/CarForm";
 
 export interface ImageItemProps {
   image: File;
@@ -21,6 +21,7 @@ export interface ImageItemProps {
 export const New = () => {
   const [carImages, setCarImages] = useState<ImageItemProps[]>([]);
   const { user } = useContext(AuthContext);
+
   const {
     register,
     handleSubmit,
@@ -59,97 +60,14 @@ export const New = () => {
   return (
     <Container>
       <PanelHeader />
-
-      <UploadCar carImages={carImages} setCarImages={setCarImages} />
-
-      <div className="w-full bg-white p-3 rounded-md flex flex-col sm:flex-row items-center gap-2">
-        <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Input
-              label="Marca"
-              type="text"
-              name="make"
-              register={register}
-              errorMessage={errors.make?.message}
-            />
-            <Input
-              label="Modelo"
-              type="text"
-              name="model"
-              register={register}
-              errorMessage={errors.model?.message}
-            />
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Input
-              label="Ano"
-              type="text"
-              name="year"
-              register={register}
-              errorMessage={errors.year?.message}
-            />
-            <Input
-              label="KM"
-              type="text"
-              name="km"
-              register={register}
-              errorMessage={errors.km?.message}
-            />
-            <Input
-              label="Preço"
-              type="text"
-              name="price"
-              register={register}
-              errorMessage={errors.price?.message}
-            />
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Input
-              label="Cidade"
-              type="text"
-              name="city"
-              register={register}
-              errorMessage={errors.city?.message}
-            />
-            <Input
-              label="Estado"
-              type="text"
-              name="state"
-              register={register}
-              errorMessage={errors.state?.message}
-            />
-            <Input
-              label="Telefone/Whatsapp"
-              type="text"
-              name="whatsapp"
-              register={register}
-              errorMessage={errors.whatsapp?.message}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="description">Descrição</label>
-            <textarea
-              className="w-full border rounded-md resize-none p-4"
-              rows={5}
-              id="description"
-              {...register("description")}
-            />
-            {errors.description && (
-              <p className="text-sm text-red-500">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
-
-          <button
-            className="w-full h-10 bg-zinc-700 text-white font-medium rounded-md cursor-pointer"
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Cadastrando..." : "Cadastrar"}
-          </button>
-        </form>
-      </div>
+      <UploadImageCar carImages={carImages} setCarImages={setCarImages} />
+      <CarForm
+        register={register}
+        errors={errors}
+        handleSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        isSubmitting={isSubmitting}
+      />
     </Container>
   );
 };
