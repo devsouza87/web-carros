@@ -9,7 +9,7 @@ export interface CardProps {
   state: string;
   price: string | number;
   uid: string;
-  images: CardImageProps[];
+  images: CardImageProps[] | string;
 }
 
 interface CardImageProps {

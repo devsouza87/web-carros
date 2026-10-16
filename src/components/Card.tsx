@@ -2,23 +2,38 @@ import { MdSpeed } from "react-icons/md";
 import type { CardProps } from "../types/Card";
 import { CiCalendar } from "react-icons/ci";
 import { useState } from "react";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { useLocation } from "react-router";
 
 export const Card = (car: CardProps) => {
   const [loadImages, setLoadImages] = useState<string[]>([]);
+  const location = useLocation();
+
+  console.log(location.pathname);
 
   function handleImageLoad(id: string) {
     setLoadImages((prev) => [...prev, id]);
   }
 
   return (
-    <section key={car.id} className="w-full bg-white rounded-lg">
+    <section key={car.id} className="w-full bg-white rounded-lg relative">
+      {location.pathname === "/dashboard" && (
+        <div className="absolute flex gap-1 right-4 top-4">
+          <div className="bg-slate-600 p-1 rounded-full">
+            <FiTrash2 size={20} color="#fff" />
+          </div>
+          <div className="bg-slate-500 p-1 rounded-full">
+            <FiEdit size={20} color="#fff" />
+          </div>
+        </div>
+      )}
       <div
         className="w-full rounded-lg mb-2 h-72 bg-slate-200"
         style={{ display: loadImages.includes(car.id) ? "none" : "block" }}
       ></div>
       <img
         className="w-full rounded-lg mb-2 max-h-72"
-        src={car.images[0].url}
+        src={car.images[0].url || car.images}
         alt={`${car.make} ${car.model}`}
         onLoad={() => handleImageLoad(car.id)}
         style={{ display: loadImages.includes(car.id) ? "block" : "none" }}
