@@ -1,15 +1,11 @@
 import { MdSpeed } from "react-icons/md";
-import type { CardProps } from "../types/Card";
 import { CiCalendar } from "react-icons/ci";
-import { useState } from "react";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { useLocation } from "react-router";
+import type { CardProps } from "../types/Card";
+import { useState } from "react";
 
 export const Card = (car: CardProps) => {
   const [loadImages, setLoadImages] = useState<string[]>([]);
-  const location = useLocation();
-
-  console.log(location.pathname);
 
   function handleImageLoad(id: string) {
     setLoadImages((prev) => [...prev, id]);
@@ -17,11 +13,14 @@ export const Card = (car: CardProps) => {
 
   return (
     <section key={car.id} className="w-full bg-white rounded-lg relative">
-      {location.pathname === "/dashboard" && (
+      {car.isDashboard && (
         <div className="absolute flex gap-1 right-4 top-4">
-          <div className="bg-slate-600 p-1 rounded-full">
+          <button
+            className="bg-slate-600 p-1 rounded-full cursor-pointer"
+            onClick={car.onDelete}
+          >
             <FiTrash2 size={20} color="#fff" />
-          </div>
+          </button>
           <div className="bg-slate-500 p-1 rounded-full">
             <FiEdit size={20} color="#fff" />
           </div>

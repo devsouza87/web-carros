@@ -10,6 +10,8 @@ export interface CardProps {
   price: string | number;
   uid: string;
   images: CardImageProps[] | string;
+  isDashboard?: boolean;
+  onDelete?: () => void;
 }
 
 interface CardImageProps {
