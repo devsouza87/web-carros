@@ -4,11 +4,11 @@ import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../../services/firebase/firebaseConnection";
 import { useEffect, useState } from "react";
 import { Card } from "../../components/Card";
-import type { CardProps } from "../../types/Card";
+import type { CarProps } from "../../types/Car";
 import { Link } from "react-router";
 
 export const Home = () => {
-  const [carCards, setCarCards] = useState<CardProps[]>([]);
+  const [carCards, setCarCards] = useState<CarProps[]>([]);
 
   useEffect(() => {
     async function loadCars() {
@@ -16,7 +16,7 @@ export const Home = () => {
       const queryRef = query(carsRef, orderBy("createdAt", "desc"));
       const snapshot = await getDocs(queryRef);
 
-      const listCars: CardProps[] = [];
+      const listCars: CarProps[] = [];
 
       snapshot.forEach((doc) => {
         listCars.push({

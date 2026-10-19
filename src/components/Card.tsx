@@ -1,7 +1,7 @@
 import { MdSpeed } from "react-icons/md";
 import { CiCalendar } from "react-icons/ci";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import type { CardProps } from "../types/Card";
+import type { CardProps } from "../types/Car";
 import { useState } from "react";
 
 export const Card = (car: CardProps) => {

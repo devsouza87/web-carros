@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { Card } from "../../components/Card";
 import { Container } from "../../components/layout/container";
 import { PanelHeader } from "../panelHeader";
-import type { CardProps } from "../../types/Card";
+import type { CarProps } from "../../types/Car";
 import {
   collection,
   getDocs,
@@ -17,10 +17,10 @@ import { db, storage } from "../../services/firebase/firebaseConnection";
 import { AuthContext } from "../../contexts/AuthContext";
 
 export const Dashboard = () => {
-  const [carCards, setCarCards] = useState<CardProps[]>([]);
+  const [carCards, setCarCards] = useState<CarProps[]>([]);
   const { user } = useContext(AuthContext);
 
-  async function deleteCar(car: CardProps) {
+  async function deleteCar(car: CarProps) {
     const docRef = doc(db, "cars", car.id);
     await deleteDoc(docRef);
 
@@ -52,7 +52,7 @@ export const Dashboard = () => {
       );
       const snapshot = await getDocs(queryRef);
 
-      const listCars: CardProps[] = [];
+      const listCars: CarProps[] = [];
 
       snapshot.forEach((doc) => {
         listCars.push({
