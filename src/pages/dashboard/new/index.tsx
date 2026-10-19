@@ -10,7 +10,7 @@ import { createCar } from "../../../services/firebase/firestore";
 import type { CarImage } from "../../../types/CarImage";
 import { UploadImageCar } from "./components/uploadImageCar";
 import { CarForm } from "./components/CarForm";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 
 export interface ImageItemProps {
   image: File;
@@ -60,7 +60,6 @@ export const New = () => {
 
   return (
     <Container>
-      <Toaster position="top-right" richColors />
       <PanelHeader />
       <UploadImageCar carImages={carImages} setCarImages={setCarImages} />
       <CarForm

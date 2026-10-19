@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   name: z.string().min(2, "O campo nome deve ter 2 ou mais caracteres."),
@@ -48,12 +49,12 @@ export const Register = () => {
           uid: r.user.uid,
         });
 
-        console.log("Cadastrado com sucesso!");
+        toast.success("Cadastrado com sucesso!");
         reset();
         navigate("/dashboard", { replace: true });
       })
       .catch((error) => {
-        console.log("Erro ao cadastrar esse usuário");
+        toast.error("Erro ao cadastrar esse usuário");
         console.error(error);
       });
   };
