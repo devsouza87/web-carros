@@ -10,6 +10,7 @@ import { createCar } from "../../../services/firebase/firestore";
 import type { CarImage } from "../../../types/CarImage";
 import { UploadImageCar } from "./components/uploadImageCar";
 import { CarForm } from "./components/CarForm";
+import { Toaster, toast } from "sonner";
 
 export interface ImageItemProps {
   image: File;
@@ -33,7 +34,7 @@ export const New = () => {
 
   async function onSubmit(data: NewCarDTO) {
     if (carImages.length === 0) {
-      alert("Envie alguma imagem deste carro.");
+      toast.error("Envie alguma imagem deste carro.");
       return;
     }
 
@@ -50,7 +51,7 @@ export const New = () => {
 
       reset();
       setCarImages([]);
-      console.log("Carro cadastrado com sucesso!");
+      toast.success("Carro cadastrado com sucesso!");
     } catch (error) {
       console.error("Erro ao cadastrar o carro:", error);
       alert("Houve um erro ao processar os uploads ou salvar o anúncio.");
@@ -59,6 +60,7 @@ export const New = () => {
 
   return (
     <Container>
+      <Toaster position="top-right" richColors />
       <PanelHeader />
       <UploadImageCar carImages={carImages} setCarImages={setCarImages} />
       <CarForm
