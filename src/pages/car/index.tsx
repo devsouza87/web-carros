@@ -83,11 +83,13 @@ export const CarDetail = () => {
             } as React.CSSProperties
           }
         >
-          {car?.images.map((image) => (
-            <SwiperSlide key={image.name}>
-              <img src={image.url} className="w-full h-96 object-cover" />
-            </SwiperSlide>
-          ))}
+          {car.images &&
+            Array.isArray(car.images) &&
+            car.images.map((image) => (
+              <SwiperSlide key={image.name}>
+                <img src={image.url} className="w-full h-96 object-cover" />
+              </SwiperSlide>
+            ))}
         </Swiper>
       )}
 

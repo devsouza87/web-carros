@@ -1,10 +1,10 @@
 import { MdSpeed } from "react-icons/md";
 import { CiCalendar } from "react-icons/ci";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import type { CardProps } from "../types/Car";
+import type { CarProps } from "../types/Car";
 import { useState } from "react";
 
-export const Card = (car: CardProps) => {
+export const Card = (car: CarProps) => {
   const [loadImages, setLoadImages] = useState<string[]>([]);
 
   function handleImageLoad(id: string) {
@@ -32,7 +32,11 @@ export const Card = (car: CardProps) => {
       ></div>
       <img
         className="w-full rounded-lg mb-2 max-h-72"
-        src={car.images[0].url || car.images}
+        src={
+          typeof car.images[0] === "object" && car.images[0] !== null
+            ? (car.images[0] as any).url
+            : ""
+        }
         alt={`${car.make} ${car.model}`}
         onLoad={() => handleImageLoad(car.id)}
         style={{ display: loadImages.includes(car.id) ? "block" : "none" }}

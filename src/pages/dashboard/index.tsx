@@ -20,26 +20,6 @@ export const Dashboard = () => {
   const [carCards, setCarCards] = useState<CarProps[]>([]);
   const { user } = useContext(AuthContext);
 
-  async function deleteCar(car: CarProps) {
-    const docRef = doc(db, "cars", car.id);
-    await deleteDoc(docRef);
-
-    car.images.map(async (image) => {
-      const imagePath = `images/${image.uid}/${image.name}`;
-      const imageRef = ref(storage, imagePath);
-
-      try {
-        await deleteObject(imageRef);
-      } catch (error) {
-        console.log("Erro ao excluir essa imagem: ", error);
-      }
-    });
-
-    setCarCards((prevCars) =>
-      prevCars.filter((prevCar) => prevCar.id !== car.id),
-    );
-  }
-
   useEffect(() => {
     async function loadCars() {
       if (!user?.uid) return;
@@ -54,35 +34,62 @@ export const Dashboard = () => {
 
       const listCars: CarProps[] = [];
 
-      snapshot.forEach((doc) => {
+      snapshot.forEach((docItem) => {
         listCars.push({
-          id: doc.id,
-          make: doc.data().make,
-          model: doc.data().model,
-          year: doc.data().year,
-          km: doc.data().km,
-          city: doc.data().city,
-          state: doc.data().state,
-          price: doc.data().price,
-          images: doc.data().images,
-          uid: doc.data().uid,
-          description: doc.data().description,
+          id: docItem.id,
+          make: docItem.data().make,
+          model: docItem.data().model,
+          year: docItem.data().year,
+          km: docItem.data().km,
+          city: docItem.data().city,
+          state: docItem.data().state,
+          price: docItem.data().price,
+          images: docItem.data().images,
+          uid: docItem.data().uid,
+          description: docItem.data().description,
+          telephone: docItem.data().telephone,
         });
       });
 
       setCarCards(listCars);
-      console.log(listCars);
     }
 
     loadCars();
   }, [user]);
+
+  async function deleteCar(car: CarProps) {
+    const docRef = doc(db, "cars", car.id);
+    await deleteDoc(docRef);
+
+    if (Array.isArray(car.images)) {
+      car.images.forEach(async (image: any) => {
+        const imagePath = `images/${image.uid}/${image.name}`;
+        const imageRef = ref(storage, imagePath);
+
+        try {
+          await deleteObject(imageRef);
+        } catch (error) {
+          console.log("Erro ao excluir essa imagem: ", error);
+        }
+      });
+    }
+
+    setCarCards((prevCars) =>
+      prevCars.filter((prevCar) => prevCar.id !== car.id),
+    );
+  }
 
   return (
     <Container>
       <PanelHeader />
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {carCards.map((card) => (
-          <Card {...card} isDashboard onDelete={() => deleteCar(card)} />
+          <Card
+            key={card.id}
+            {...card}
+            isDashboard
+            onDelete={() => deleteCar(card)}
+          />
         ))}
       </main>
     </Container>
