@@ -11,6 +11,7 @@ import type { CarImage } from "../../../types/CarImage";
 import { UploadImageCar } from "./components/uploadImageCar";
 import { CarForm } from "./components/CarForm";
 import { toast } from "sonner";
+import type { CreateCarProps } from "../../../types/Car";
 
 export interface ImageItemProps {
   image: File;
@@ -42,12 +43,28 @@ export const New = () => {
       const uploadPromises = carImages.map(async (car) => {
         return await uploadImage(car.image, car.uid, car.name);
       });
+
       const listImages: CarImage[] = await Promise.all(uploadPromises);
 
-      await createCar(data, listImages, {
-        name: user?.name ?? "",
-        uid: user?.uid ?? "",
-      });
+      const newCar: CreateCarProps = {
+        make: data.make.toUpperCase(),
+        model: data.model.toUpperCase(),
+        version: data.version.toUpperCase(),
+        name: `${data.make.toUpperCase()} ${data.model.toUpperCase()}`,
+        year: data.year,
+        km: data.km,
+        price: data.price,
+        city: data.city,
+        state: data.state,
+        telephone: data.telephone,
+        description: data.description,
+        images: listImages,
+        owner: user?.name,
+        uid: user?.uid,
+        createdAt: new Date(),
+      };
+
+      await createCar(newCar);
 
       reset();
       setCarImages([]);

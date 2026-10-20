@@ -32,6 +32,7 @@ export const CarForm = ({
             name="make"
             register={register}
             errorMessage={errors.make?.message}
+            placeholder="Chevrolet"
           />
           <Input
             label="Modelo"
@@ -39,6 +40,15 @@ export const CarForm = ({
             name="model"
             register={register}
             errorMessage={errors.model?.message}
+            placeholder="Prisma"
+          />
+          <Input
+            label="Versão"
+            type="text"
+            name="version"
+            register={register}
+            errorMessage={errors.version?.message}
+            placeholder="1.8 PREMIER 8V FLEX 4P AUTOMÁTICO"
           />
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -48,6 +58,7 @@ export const CarForm = ({
             name="year"
             register={register}
             errorMessage={errors.year?.message}
+            placeholder="2020"
           />
           <Input
             label="KM"
@@ -55,6 +66,7 @@ export const CarForm = ({
             name="km"
             register={register}
             errorMessage={errors.km?.message}
+            placeholder="18.000"
           />
           <Input
             label="Preço"
@@ -62,6 +74,7 @@ export const CarForm = ({
             name="price"
             register={register}
             errorMessage={errors.price?.message}
+            placeholder="72.000,00"
           />
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -71,6 +84,7 @@ export const CarForm = ({
             name="city"
             register={register}
             errorMessage={errors.city?.message}
+            placeholder="Cariacica"
           />
           <Input
             label="Estado"
@@ -78,6 +92,7 @@ export const CarForm = ({
             name="state"
             register={register}
             errorMessage={errors.state?.message}
+            placeholder="ES"
           />
           <Input
             label="Telefone/Whatsapp"
@@ -85,6 +100,7 @@ export const CarForm = ({
             name="telephone"
             register={register}
             errorMessage={errors.telephone?.message}
+            placeholder="(27) 9 9999-9999"
           />
         </div>
         <div className="mb-3">
@@ -94,6 +110,7 @@ export const CarForm = ({
             rows={5}
             id="description"
             {...register("description" as any)}
+            placeholder="Alarme, vidros elétricos, sensor de estacionamento..."
           />
           {errors.description && (
             <p className="text-sm text-red-500">{errors.description.message}</p>

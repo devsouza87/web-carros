@@ -3,6 +3,7 @@ import z from "zod";
 export const newCarSchema = z.object({
   make: z.string().nonempty("O campo nome é obrigatório."),
   model: z.string().nonempty("O modelo é obrigatório."),
+  version: z.string().nonempty("O Campo versão é obrigatório"),
   year: z.string().nonempty("O ano é obrigatório."),
   km: z.string().nonempty("O km é obrigatório."),
   price: z.string().nonempty("O preço é obrigatório."),

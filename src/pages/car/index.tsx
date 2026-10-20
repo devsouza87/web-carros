@@ -36,6 +36,7 @@ export const CarDetail = () => {
         id: snapshot.id,
         make: snapshot.data()?.make,
         model: snapshot.data()?.model,
+        name: `${snapshot.data()?.make} ${snapshot.data()?.model}`,
         year: snapshot.data()?.year,
         km: snapshot.data()?.km,
         city: snapshot.data()?.city,

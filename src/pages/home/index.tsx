@@ -2,85 +2,63 @@ import { Container } from "../../components/layout/container";
 import { Button } from "../../components/ui/button";
 import { collection, query, getDocs, orderBy, where } from "firebase/firestore";
 import { db } from "../../services/firebase/firebaseConnection";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card } from "../../components/Card";
-import type { CarProps } from "../../types/Car";
+import type { CardProps } from "../../types/Car";
 import { Link } from "react-router";
 
 export const Home = () => {
-  const [carCards, setCarCards] = useState<CarProps[]>([]);
+  const [carCards, setCarCards] = useState<CardProps[]>([]);
   const [searchInput, setSearchInput] = useState("");
 
-  async function loadCars() {
+  const fetchCars = useCallback(async (searchQuery?: string) => {
     const carsRef = collection(db, "cars");
-    const queryRef = query(carsRef, orderBy("createdAt", "desc"));
-    const snapshot = await getDocs(queryRef);
 
-    const listCars: CarProps[] = [];
+    try {
+      let queryRef;
 
-    snapshot.forEach((doc) => {
-      listCars.push({
-        id: doc.id,
-        make: doc.data().make,
-        model: doc.data().model,
-        year: doc.data().year,
-        km: doc.data().km,
-        city: doc.data().city,
-        state: doc.data().state,
-        price: doc.data().price,
-        images: doc.data().images,
-        uid: doc.data().uid,
-        description: doc.data().description,
-        telephone: doc.data().telephone,
+      if (searchQuery && searchQuery.trim() !== "") {
+        const normalizedQuery = searchQuery.trim().toUpperCase();
+        queryRef = query(
+          carsRef,
+          where("name", ">=", normalizedQuery),
+          where("name", "<=", normalizedQuery + "\uf8ff"),
+          orderBy("createdAt", "desc"),
+        );
+      } else {
+        queryRef = query(carsRef, orderBy("createdAt", "desc"));
+      }
+
+      const snapshot = await getDocs(queryRef);
+
+      const listCars: CardProps[] = snapshot.docs.map((docItem) => {
+        const data = docItem.data();
+        return {
+          id: docItem.id,
+          name: data.name,
+          version: data.version,
+          year: data.year,
+          km: data.km,
+          city: data.city,
+          state: data.state,
+          price: data.price,
+          images: data.images,
+        };
       });
-    });
 
-    setCarCards(listCars);
-  }
-
-  useEffect(() => {
-    loadCars();
+      setCarCards(listCars);
+    } catch (error) {
+      console.log("Erro ao buscar carros: ", error);
+    }
   }, []);
 
-  async function handleSearchCar() {
-    if (searchInput === "") {
-      loadCars();
-      return;
-    }
+  useEffect(() => {
+    fetchCars();
+  }, [fetchCars]);
 
-    setCarCards([]);
-
-    // Convertemos o input para letras minúsculas para facilitar a busca (opcional, se salvar assim no banco)
-    //const normalizedQuery = searchInput.toUpperCase(); // ou toLowerCase() dependendo de como salva
-
-    const q = query(
-      collection(db, "cars"),
-      where("make", ">=", searchInput),
-      where("make", "<=", searchInput + "\uf8ff"),
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    const listCars: CarProps[] = [];
-    querySnapshot.forEach((doc) => {
-      listCars.push({
-        id: doc.id,
-        make: doc.data().make,
-        model: doc.data().model,
-        year: doc.data().year,
-        km: doc.data().km,
-        city: doc.data().city,
-        state: doc.data().state,
-        price: doc.data().price,
-        images: doc.data().images,
-        uid: doc.data().uid,
-        description: doc.data().description,
-        telephone: doc.data().telephone,
-      });
-    });
-
-    setCarCards(listCars);
-  }
+  const handleSearchCar = () => {
+    fetchCars(searchInput);
+  };
 
   return (
     <Container>
@@ -94,6 +72,7 @@ export const Home = () => {
         />
         <Button bg="bg-red-500" label="Buscar" onClick={handleSearchCar} />
       </section>
+
       <h1 className="font-bold text-center text-2xl mb-4">
         Carros novos e usados em todo o Brasil
       </h1>

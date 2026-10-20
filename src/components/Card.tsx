@@ -1,10 +1,10 @@
 import { MdSpeed } from "react-icons/md";
 import { CiCalendar } from "react-icons/ci";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import type { CarProps } from "../types/Car";
+import type { CardProps } from "../types/Car";
 import { useState } from "react";
 
-export const Card = (car: CarProps) => {
+export const Card = (car: CardProps) => {
   const [loadImages, setLoadImages] = useState<string[]>([]);
 
   function handleImageLoad(id: string) {
@@ -26,10 +26,12 @@ export const Card = (car: CarProps) => {
           </div>
         </div>
       )}
+
       <div
         className="w-full rounded-lg mb-2 h-72 bg-slate-200"
         style={{ display: loadImages.includes(car.id) ? "none" : "block" }}
       ></div>
+
       <img
         className="w-full rounded-lg mb-2 max-h-72"
         src={
@@ -37,15 +39,13 @@ export const Card = (car: CarProps) => {
             ? (car.images[0] as any).url
             : ""
         }
-        alt={`${car.make} ${car.model}`}
+        alt={`${car.name}`}
         onLoad={() => handleImageLoad(car.id)}
         style={{ display: loadImages.includes(car.id) ? "block" : "none" }}
       />
 
-      <h1 className="font-bold mt-2 px-2">
-        {car.make} {car.model}
-      </h1>
-      <p className="text-sm px-2 mb-2">{car.description}</p>
+      <h1 className="font-bold mt-2 px-2">{car.name}</h1>
+      <p className="text-sm px-2 mb-2">{car.version}</p>
       <div className="flex items-center gap-4 px-2 mb-4">
         <span className="text-zinc-700 flex items-center gap-1">
           <CiCalendar /> {car.year}
