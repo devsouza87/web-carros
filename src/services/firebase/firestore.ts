@@ -3,10 +3,12 @@ import { db } from "./firebaseConnection";
 import type { CreateCarProps } from "../../types/Car";
 
 export async function createCar(data: CreateCarProps) {
+  console.log(data.version);
   await addDoc(collection(db, "cars"), {
     make: data.make,
     model: data.model,
     name: data.name,
+    version: data.version,
     year: data.year,
     km: data.km,
     price: data.price,

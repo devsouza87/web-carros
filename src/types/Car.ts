@@ -30,6 +30,22 @@ export interface CardProps {
   onDelete?: () => void;
 }
 
+export interface CarProps {
+  id: string;
+  make: string;
+  model: string;
+  version: string;
+  year: string;
+  km: string;
+  city: string;
+  state: string;
+  images: string;
+  description: string;
+  price: string;
+  telephone: string;
+  uid: string;
+}
+
 interface CarImageProps {
   name: string;
   uid: string;

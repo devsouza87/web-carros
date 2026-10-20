@@ -36,7 +36,7 @@ export const CarDetail = () => {
         id: snapshot.id,
         make: snapshot.data()?.make,
         model: snapshot.data()?.model,
-        name: `${snapshot.data()?.make} ${snapshot.data()?.model}`,
+        version: snapshot.data()?.version,
         year: snapshot.data()?.year,
         km: snapshot.data()?.km,
         city: snapshot.data()?.city,
@@ -103,7 +103,7 @@ export const CarDetail = () => {
             <h1>R$ {car.price}</h1>
           </div>
 
-          <p>{car.description}</p>
+          <p>{car.version}</p>
 
           <div className="flex w-full gap-6 my-4">
             <div className="flex flex-col gap-4">

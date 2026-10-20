@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { Card } from "../../components/Card";
 import { Container } from "../../components/layout/container";
 import { PanelHeader } from "../panelHeader";
-import type { CarProps } from "../../types/Car";
+import type { CardProps } from "../../types/Car";
 import {
   collection,
   getDocs,
@@ -17,7 +17,7 @@ import { db, storage } from "../../services/firebase/firebaseConnection";
 import { AuthContext } from "../../contexts/AuthContext";
 
 export const Dashboard = () => {
-  const [carCards, setCarCards] = useState<CarProps[]>([]);
+  const [carCards, setCarCards] = useState<CardProps[]>([]);
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -32,22 +32,19 @@ export const Dashboard = () => {
       );
       const snapshot = await getDocs(queryRef);
 
-      const listCars: CarProps[] = [];
+      const listCars: CardProps[] = [];
 
       snapshot.forEach((docItem) => {
         listCars.push({
           id: docItem.id,
-          make: docItem.data().make,
-          model: docItem.data().model,
+          name: docItem.data().name,
+          version: docItem.data().version,
           year: docItem.data().year,
           km: docItem.data().km,
           city: docItem.data().city,
           state: docItem.data().state,
           price: docItem.data().price,
           images: docItem.data().images,
-          uid: docItem.data().uid,
-          description: docItem.data().description,
-          telephone: docItem.data().telephone,
         });
       });
 
@@ -57,7 +54,7 @@ export const Dashboard = () => {
     loadCars();
   }, [user]);
 
-  async function deleteCar(car: CarProps) {
+  async function deleteCar(car: CardProps) {
     const docRef = doc(db, "cars", car.id);
     await deleteDoc(docRef);
 
