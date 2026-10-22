@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { Card } from "../../components/Card";
 import { Container } from "../../components/layout/container";
 import { PanelHeader } from "../panelHeader";
-import type { CardProps } from "../../types/Car";
+import type { CardProps, CarImageProps } from "../../types/Car";
 import {
   collection,
   getDocs,
@@ -59,7 +59,7 @@ export const Dashboard = () => {
     await deleteDoc(docRef);
 
     if (Array.isArray(car.images)) {
-      car.images.forEach(async (image: any) => {
+      car.images.forEach(async (image: CarImageProps) => {
         const imagePath = `images/${image.uid}/${image.name}`;
         const imageRef = ref(storage, imagePath);
 

@@ -12,6 +12,9 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
+import { formatCurrency } from "../../utils/formatCurrency";
+import { formatKm } from "../../utils/formatKm";
+import { formatPhone } from "../../utils/formatPhone";
 
 export const CarDetail = () => {
   const [slidePerView, setSlidePerView] = useState<number>(2);
@@ -100,7 +103,7 @@ export const CarDetail = () => {
             <h1 className="uppercase">
               {car.make} <span className="text-red-500">{car.model}</span>
             </h1>
-            <h1>R$ {car.price}</h1>
+            <h1>{formatCurrency(car.price)}</h1>
           </div>
 
           <p>{car.version}</p>
@@ -120,7 +123,7 @@ export const CarDetail = () => {
             <div className="flex flex-col gap-4">
               <div>
                 <p>KM</p>
-                <strong>{car.km}</strong>
+                <strong>{formatKm(car.km)}</strong>
               </div>
             </div>
           </div>
@@ -129,7 +132,7 @@ export const CarDetail = () => {
           <p className="mb-4">{car.description}</p>
 
           <strong>Telefone/WhatsApp</strong>
-          <p className="mb-6">{car.telephone}</p>
+          <p className="mb-6">{formatPhone(car.telephone)}</p>
 
           <a
             className="bg-green-500 w-full text-white flex items-center justify-center gap-2 h-10 text-xl font-medium rounded-md"
