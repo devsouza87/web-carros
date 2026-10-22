@@ -12,6 +12,7 @@ import { UploadImageCar } from "./components/uploadImageCar";
 import { CarForm } from "./components/CarForm";
 import { toast } from "sonner";
 import type { CreateCarProps } from "../../../types/Car";
+import { unmaskPhone, unmaskCurrency, unmaskKm } from "../../../utils/masks";
 
 export interface ImageItemProps {
   image: File;
@@ -27,10 +28,23 @@ export const New = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<NewCarDTO>({
     resolver: zodResolver(newCarSchema),
+    defaultValues: {
+      make: "",
+      model: "",
+      version: "",
+      year: "",
+      km: "",
+      price: "",
+      city: "",
+      state: "",
+      telephone: "",
+      description: "",
+    },
   });
 
   async function onSubmit(data: NewCarDTO) {
@@ -52,11 +66,11 @@ export const New = () => {
         version: data.version.toUpperCase(),
         name: `${data.make.toUpperCase()} ${data.model.toUpperCase()}`,
         year: data.year,
-        km: data.km,
-        price: data.price,
+        km: Number(unmaskKm(data.km)),
+        price: Number(unmaskCurrency(data.price)),
         city: data.city,
         state: data.state,
-        telephone: data.telephone,
+        telephone: unmaskPhone(data.telephone),
         description: data.description,
         images: listImages,
         owner: user?.name,
@@ -80,6 +94,7 @@ export const New = () => {
       <PanelHeader />
       <UploadImageCar carImages={carImages} setCarImages={setCarImages} />
       <CarForm
+        control={control}
         register={register}
         errors={errors}
         handleSubmit={handleSubmit}

@@ -1,14 +1,17 @@
 import type {
-  UseFormRegister,
   FieldErrors,
+  Control,
   UseFormHandleSubmit,
 } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { Input } from "../../../../components/ui/input";
 import { Button } from "../../../../components/ui/button";
-import type { NewCarDTO } from "../../../../schemas/new-car"; // Ajuste o caminho do seu schema
+import type { NewCarDTO } from "../../../../schemas/new-car";
+import { maskPhone, maskCurrency, maskKm } from "../../../../utils/masks";
 
 type CarFormProps = {
-  register: UseFormRegister<NewCarDTO>;
+  control: Control<NewCarDTO>; // Mudou de register para control nos campos mascarados
+  register: any; // Mantido para os outros campos normais
   errors: FieldErrors<NewCarDTO>;
   handleSubmit: UseFormHandleSubmit<NewCarDTO>;
   onSubmit: (data: NewCarDTO) => Promise<void>;
@@ -16,6 +19,7 @@ type CarFormProps = {
 };
 
 export const CarForm = ({
+  control,
   register,
   errors,
   handleSubmit,
@@ -51,6 +55,7 @@ export const CarForm = ({
             placeholder="1.8 PREMIER 8V FLEX 4P AUTOMÁTICO"
           />
         </div>
+
         <div className="flex flex-col sm:flex-row gap-3">
           <Input
             label="Ano"
@@ -60,23 +65,49 @@ export const CarForm = ({
             errorMessage={errors.year?.message}
             placeholder="2020"
           />
-          <Input
-            label="KM"
-            type="text"
+
+          {/* KM com Máscara */}
+          <Controller
             name="km"
-            register={register}
-            errorMessage={errors.km?.message}
-            placeholder="18.000"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                label="KM"
+                type="text"
+                name="km"
+                value={value || ""}
+                onChange={(e) => {
+                  const masked = maskKm(e.target.value);
+                  onChange(masked);
+                }}
+                errorMessage={errors.km?.message}
+                placeholder="18.038"
+                // REMOVIDO o register daqui
+              />
+            )}
           />
-          <Input
-            label="Preço"
-            type="text"
+
+          {/* Preço com Máscara */}
+          <Controller
             name="price"
-            register={register}
-            errorMessage={errors.price?.message}
-            placeholder="72.000,00"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                label="Preço"
+                type="text"
+                name="price"
+                value={value || ""} // <-- Garante que nunca será undefined
+                onChange={(e) => {
+                  const masked = maskCurrency(e.target.value);
+                  onChange(masked);
+                }}
+                errorMessage={errors.price?.message}
+                placeholder="72.000,00"
+              />
+            )}
           />
         </div>
+
         <div className="flex flex-col sm:flex-row gap-3">
           <Input
             label="Cidade"
@@ -94,28 +125,43 @@ export const CarForm = ({
             errorMessage={errors.state?.message}
             placeholder="ES"
           />
-          <Input
-            label="Telefone/Whatsapp"
-            type="text"
+
+          {/* Telefone com Máscara */}
+          <Controller
             name="telephone"
-            register={register}
-            errorMessage={errors.telephone?.message}
-            placeholder="(27) 9 9999-9999"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                label="Telefone/Whatsapp"
+                type="text"
+                name="telephone"
+                value={value || ""}
+                onChange={(e) => {
+                  const masked = maskPhone(e.target.value);
+                  onChange(masked);
+                }}
+                errorMessage={errors.telephone?.message}
+                placeholder="(27) 9 9999-9999"
+                // REMOVIDO o register daqui
+              />
+            )}
           />
         </div>
+
         <div className="mb-3">
           <label htmlFor="description">Descrição</label>
           <textarea
             className="w-full border rounded-md resize-none p-4"
             rows={5}
             id="description"
-            {...register("description" as any)}
+            {...register("description")}
             placeholder="Alarme, vidros elétricos, sensor de estacionamento..."
           />
           {errors.description && (
             <p className="text-sm text-red-500">{errors.description.message}</p>
           )}
         </div>
+
         <Button
           width
           bg="bg-zinc-700"

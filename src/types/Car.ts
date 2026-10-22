@@ -4,8 +4,8 @@ export type CreateCarProps = {
   version: string;
   name: string;
   year: string;
-  km: string;
-  price: string;
+  km: number;
+  price: number;
   city: string;
   state: string;
   telephone: string;
@@ -21,8 +21,8 @@ export interface CardProps {
   name: string;
   version: string;
   year: string;
-  km: string;
-  price: string;
+  km: number;
+  price: number;
   city: string;
   state: string;
   images: CarImageProps[] | string;
@@ -36,17 +36,17 @@ export interface CarProps {
   model: string;
   version: string;
   year: string;
-  km: string;
+  km: number;
   city: string;
   state: string;
   images: string;
   description: string;
-  price: string;
+  price: number;
   telephone: string;
   uid: string;
 }
 
-interface CarImageProps {
+export interface CarImageProps {
   name: string;
   uid: string;
   url: string;

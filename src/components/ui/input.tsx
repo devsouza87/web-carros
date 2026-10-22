@@ -10,7 +10,7 @@ type InputProps<T extends FieldValues> =
     label?: string;
     name: Path<T>;
     errorMessage?: string;
-    register: UseFormRegister<T>;
+    register?: UseFormRegister<T>; // <-- Tornada opcional com '?'
   };
 
 export const Input = <T extends FieldValues>({
@@ -26,7 +26,7 @@ export const Input = <T extends FieldValues>({
 
       <input
         className="w-full border rounded-md h-11 px-2 outline-none"
-        {...register(name)}
+        {...(register ? register(name) : {})} // <-- Só aplica o register se ele existir
         {...rest}
       />
 

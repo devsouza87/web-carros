@@ -3,6 +3,8 @@ import { CiCalendar } from "react-icons/ci";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import type { CardProps } from "../types/Car";
 import { useState } from "react";
+import { formatCurrency } from "../utils/formatCurrency";
+import { formatKm } from "../utils/formatKm";
 
 export const Card = (car: CardProps) => {
   const [loadImages, setLoadImages] = useState<string[]>([]);
@@ -51,12 +53,12 @@ export const Card = (car: CardProps) => {
           <CiCalendar /> {car.year}
         </span>
         <span className="text-zinc-700 flex items-center gap-1">
-          <MdSpeed /> {car.km} km
+          <MdSpeed /> {formatKm(car.km)} km
         </span>
       </div>
 
       <strong className="text-black font-medium text-xl px-2">
-        R$ {car.price}
+        {formatCurrency(car.price)}
       </strong>
 
       <div className="w-full h-px bg-slate-200 my-2"></div>
